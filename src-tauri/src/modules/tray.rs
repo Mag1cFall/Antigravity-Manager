@@ -168,37 +168,56 @@ pub fn update_tray_menus<R: Runtime>(app: &tauri::AppHandle<R>) {
          // 获取当前账号信息
          let current = modules::get_current_account_id().unwrap_or(None);
          
-         let (user_text, quota_text) = if let Some(id) = current {
+         let mut menu_lines = Vec::new();
+         let mut user_text = format!("{}: {}", texts.current, texts.no_account);
+
+         if let Some(id) = current {
              if let Ok(account) = modules::load_account(&id) {
-                 let email = account.email;
-                 let q_text = if let Some(q) = account.quota {
+                 user_text = format!("{}: {}", texts.current, account.email);
+                 
+                 if let Some(q) = account.quota {
                      if q.is_forbidden {
-                         format!("🚫 {}", texts.forbidden)
+                         menu_lines.push(format!("🚫 {}", texts.forbidden));
                      } else {
-                         // 提取 Gemini 和 Claude
-                         let mut g_p = 0;
-                         let mut c_p = 0;
+                         // 提取 3 个指定模型
+                         let mut gemini_high = 0;
+                         let mut gemini_image = 0;
+                         let mut claude = 0;
+                         
+                         // 使用严格匹配，与前端一致
                          for m in q.models {
-                             if m.name.to_lowercase().contains("gemini") { g_p = m.percentage; }
-                             if m.name.to_lowercase().contains("claude") { c_p = m.percentage; }
+                             let name = m.name.to_lowercase();
+                             if name == "gemini-3-pro-high" { gemini_high = m.percentage; }
+                             if name == "gemini-3-pro-image" { gemini_image = m.percentage; }
+                             if name == "claude-sonnet-4-5" { claude = m.percentage; }
                          }
-                         format!("Gemini: {}%  Claude: {}%", g_p, c_p)
+                         
+                         menu_lines.push(format!("Gemini High: {}%", gemini_high));
+                         menu_lines.push(format!("Gemini Image: {}%", gemini_image));
+                         menu_lines.push(format!("Claude 4.5: {}%", claude));
                      }
                  } else {
-                     texts.unknown_quota.clone()
-                 };
-                 
-                 (format!("{}: {}", texts.current, email), q_text)
+                     menu_lines.push(texts.unknown_quota.clone());
+                 }
              } else {
-                 (format!("{}: Error", texts.current), format!("{}: --", texts.quota))
+                 user_text = format!("{}: Error", texts.current);
+                 menu_lines.push(format!("{}: --", texts.quota));
              }
          } else {
-             (format!("{}: {}", texts.current, texts.no_account), texts.unknown_quota.clone())
+             menu_lines.push(texts.unknown_quota.clone());
          };
 
-         // 重新构建菜单项（使用翻译文本）
+         // 重新构建菜单项
          let info_user = MenuItem::with_id(&app_clone, "info_user", &user_text, false, None::<&str>);
-         let info_quota = MenuItem::with_id(&app_clone, "info_quota", &quota_text, false, None::<&str>);
+         
+         // 动态创建额度项
+         let mut quota_items = Vec::new();
+         for (i, line) in menu_lines.iter().enumerate() {
+             let item = MenuItem::with_id(&app_clone, format!("info_quota_{}", i), line, false, None::<&str>);
+             if let Ok(item) = item {
+                 quota_items.push(item);
+             }
+         }
          
          let switch_next = MenuItem::with_id(&app_clone, "switch_next", &texts.switch_next, true, None::<&str>);
          let refresh_curr = MenuItem::with_id(&app_clone, "refresh_curr", &texts.refresh_current, true, None::<&str>);
@@ -206,13 +225,17 @@ pub fn update_tray_menus<R: Runtime>(app: &tauri::AppHandle<R>) {
          let show_i = MenuItem::with_id(&app_clone, "show", &texts.show_window, true, None::<&str>);
          let quit_i = MenuItem::with_id(&app_clone, "quit", &texts.quit, true, None::<&str>);
          
-         // 忽略错误处理以保持代码简洁，实际应该 handle
-         if let (Ok(i_u), Ok(i_q), Ok(s_n), Ok(r_c), Ok(s), Ok(q)) = (info_user, info_quota, switch_next, refresh_curr, show_i, quit_i) {
+         if let (Ok(i_u), Ok(s_n), Ok(r_c), Ok(s), Ok(q)) = (info_user, switch_next, refresh_curr, show_i, quit_i) {
              let sep1 = PredefinedMenuItem::separator(&app_clone).ok();
              let sep2 = PredefinedMenuItem::separator(&app_clone).ok();
              let sep3 = PredefinedMenuItem::separator(&app_clone).ok();
              
-             let mut items: Vec<&dyn tauri::menu::IsMenuItem<R>> = vec![&i_u, &i_q];
+             let mut items: Vec<&dyn tauri::menu::IsMenuItem<R>> = vec![&i_u];
+             // 添加动态的额度项
+             for item in &quota_items {
+                 items.push(item);
+             }
+             
              if let Some(ref s) = sep1 { items.push(s); }
              items.push(&s_n);
              items.push(&r_c);

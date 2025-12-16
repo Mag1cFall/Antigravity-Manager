@@ -67,5 +67,13 @@ pub fn inject_token(
     )
     .map_err(|e| format!("写入数据失败: {}", e))?;
 
+    // 8. 注入 Onboarding 标记
+    let onboarding_key = "antigravityOnboarding";
+    conn.execute(
+        "INSERT OR REPLACE INTO ItemTable (key, value) VALUES (?, ?)",
+        [onboarding_key, "true"],
+    )
+    .map_err(|e| format!("写入 Onboarding 标记失败: {}", e))?;
+
     Ok(format!("Token 注入成功！\n数据库: {:?}", db_path))
 }

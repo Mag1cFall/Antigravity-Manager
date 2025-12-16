@@ -20,8 +20,9 @@ import { useTranslation } from 'react-i18next';
 
 function AccountRow({ account, selected, onSelect, isCurrent, isRefreshing, isSwitching = false, onSwitch, onRefresh, onViewDetails, onExport, onDelete }: AccountRowProps) {
     const { t } = useTranslation();
-    const geminiModel = account.quota?.models.find(m => m.name.toLowerCase().includes('gemini'));
-    const claudeModel = account.quota?.models.find(m => m.name.toLowerCase().includes('claude'));
+    const geminiModel = account.quota?.models.find(m => m.name.toLowerCase() === 'gemini-3-pro-high');
+    const geminiImageModel = account.quota?.models.find(m => m.name.toLowerCase() === 'gemini-3-pro-image');
+    const claudeModel = account.quota?.models.find(m => m.name.toLowerCase() === 'claude-sonnet-4-5');
 
     // 颜色映射，避免动态类名被 Tailwind purge
     const getColorClass = (percentage: number) => {
@@ -78,7 +79,7 @@ function AccountRow({ account, selected, onSelect, isCurrent, isRefreshing, isSw
                     <div className="flex flex-col gap-0.5">
                         {/* Gemini */}
                         <div className="flex items-center gap-2">
-                            <div className="w-20 text-xs font-medium text-gray-500 dark:text-gray-400">Gemini 3 Pro</div>
+                            <div className="w-32 text-xs font-medium text-gray-500 dark:text-gray-400">Gemini 3 Pro (High)</div>
                             {geminiModel ? (
                                 <>
                                     <div className="w-24 h-1 bg-gray-100 dark:bg-base-300 rounded-full overflow-hidden">
@@ -101,9 +102,34 @@ function AccountRow({ account, selected, onSelect, isCurrent, isRefreshing, isSw
                             )}
                         </div>
 
+                        {/* Gemini Image */}
+                        <div className="flex items-center gap-2">
+                            <div className="w-32 text-xs font-medium text-gray-500 dark:text-gray-400">Gemini 3 Pro Image</div>
+                            {geminiImageModel ? (
+                                <>
+                                    <div className="w-24 h-1 bg-gray-100 dark:bg-base-300 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full ${getColorClass(geminiImageModel.percentage)} rounded-full`}
+                                            style={{ width: `${geminiImageModel.percentage}%` }}
+                                        />
+                                    </div>
+                                    <div className="w-8 text-xs text-right text-gray-700 dark:text-gray-300 font-bold font-mono">
+                                        {geminiImageModel.percentage}%
+                                    </div>
+                                    {geminiImageModel.reset_time && (
+                                        <div className="text-[10px] text-gray-400 dark:text-gray-500 font-mono" title={`${t('accounts.reset_time')}: ${new Date(geminiImageModel.reset_time).toLocaleString()}`}>
+                                            R: {formatTimeRemaining(geminiImageModel.reset_time)}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <span className="text-xs text-gray-400 dark:text-gray-500 flex-1">无数据</span>
+                            )}
+                        </div>
+
                         {/* Claude */}
                         <div className="flex items-center gap-2">
-                            <div className="w-20 text-xs font-medium text-gray-500 dark:text-gray-400">Claude 4.5</div>
+                            <div className="w-32 text-xs font-medium text-gray-500 dark:text-gray-400">Claude-sonnet-4.5</div>
                             {claudeModel ? (
                                 <>
                                     <div className="w-24 h-1 bg-gray-100 dark:bg-base-300 rounded-full overflow-hidden">

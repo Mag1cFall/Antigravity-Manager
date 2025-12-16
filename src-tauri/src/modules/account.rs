@@ -386,6 +386,8 @@ pub async fn fetch_quota_with_retry(account: &mut Account) -> crate::error::AppR
                     account.token.refresh_token.clone(),
                     token_res.expires_in,
                     account.token.email.clone(),
+                    account.token.project_id.clone(), // 保留原有 project_id
+                    None, // 添加 None 作为 session_id
                 );
                 
                 // 重新获取用户名

@@ -2,6 +2,9 @@ use crate::models::{Account, TokenData, QuotaData, AppConfig};
 use crate::modules;
 use tauri::Emitter;
 
+// 导出 proxy 命令
+pub mod proxy;
+
 /// 列出所有账号
 #[tauri::command]
 pub async fn list_accounts() -> Result<Vec<Account>, String> {
@@ -24,6 +27,8 @@ pub async fn add_account(_email: String, refresh_token: String) -> Result<Accoun
         refresh_token, // 继续使用用户传入的 refresh_token
         token_res.expires_in,
         Some(user_info.email.clone()),
+        None, // project_id 将在需要时获取
+        None,  // session_id
     );
     
     // 4. 使用真实的 email 添加或更新账号
@@ -176,15 +181,22 @@ pub async fn start_oauth_login(app_handle: tauri::AppHandle) -> Result<Account, 
     // 2. 获取用户信息
     let user_info = modules::oauth::get_user_info(&token_res.access_token).await?;
     
-    // 3. 构造 TokenData
+    // 3. 尝试获取项目ID
+    let project_id = crate::proxy::project_resolver::fetch_project_id(&token_res.access_token)
+        .await
+        .ok(); // 失败不阻塞，后续可懒加载
+    
+    // 4. 构造 TokenData
     let token_data = TokenData::new(
         token_res.access_token,
         token_res.refresh_token.ok_or("未获取到 Refresh Token")?,
         token_res.expires_in,
-        Some(user_info.email.clone())
+        Some(user_info.email.clone()),
+        project_id, // 保存项目ID
+        None,  // session_id
     );
     
-    // 4. 添加或更新到账号列表
+    // 5. 添加或更新到账号列表
     modules::upsert_account(user_info.email.clone(), user_info.get_display_name(), token_data)
 }
 

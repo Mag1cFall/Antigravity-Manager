@@ -6,7 +6,7 @@ const CLIENT_ID: &str = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.goo
 const CLIENT_SECRET: &str = "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";
 const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 const USERINFO_URL: &str = "https://www.googleapis.com/oauth2/v2/userinfo";
-const REDIRECT_URI: &str = "http://localhost:8888/oauth-callback";
+
 const AUTH_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -183,12 +183,12 @@ pub async fn ensure_fresh_token(
     let response = refresh_access_token(&current_token.refresh_token).await?;
     
     // 构造新 TokenData
-    Ok(crate::models::TokenData {
-        access_token: response.access_token,
-        refresh_token: current_token.refresh_token.clone(), // 刷新时不一定会返回新的 refresh_token
-        expires_in: response.expires_in,
-        expiry_timestamp: now + response.expires_in,
-        email: current_token.email.clone(),
-        token_type: "Bearer".to_string(),
-    })
+    Ok(crate::models::TokenData::new(
+        response.access_token,
+        current_token.refresh_token.clone(), // 刷新时不一定会返回新的 refresh_token
+        response.expires_in,
+        current_token.email.clone(),
+        current_token.project_id.clone(), // 保留原有 project_id
+        None,  // session_id 会在 token_manager 中生成
+    ))
 }

@@ -33,16 +33,20 @@ function Dashboard() {
     // 计算统计数据
     const stats = useMemo(() => {
         const geminiQuotas = accounts
-            .map(a => a.quota?.models.find(m => m.name.toLowerCase().includes('gemini'))?.percentage || 0)
+            .map(a => a.quota?.models.find(m => m.name.toLowerCase() === 'gemini-3-pro-high')?.percentage || 0)
+            .filter(q => q > 0);
+
+        const geminiImageQuotas = accounts
+            .map(a => a.quota?.models.find(m => m.name.toLowerCase() === 'gemini-3-pro-image')?.percentage || 0)
             .filter(q => q > 0);
 
         const claudeQuotas = accounts
-            .map(a => a.quota?.models.find(m => m.name.toLowerCase().includes('claude'))?.percentage || 0)
+            .map(a => a.quota?.models.find(m => m.name.toLowerCase() === 'claude-sonnet-4-5')?.percentage || 0)
             .filter(q => q > 0);
 
         const lowQuotaCount = accounts.filter(a => {
-            const gemini = a.quota?.models.find(m => m.name.toLowerCase().includes('gemini'))?.percentage || 0;
-            const claude = a.quota?.models.find(m => m.name.toLowerCase().includes('claude'))?.percentage || 0;
+            const gemini = a.quota?.models.find(m => m.name.toLowerCase() === 'gemini-3-pro-high')?.percentage || 0;
+            const claude = a.quota?.models.find(m => m.name.toLowerCase() === 'claude-sonnet-4-5')?.percentage || 0;
             return gemini < 20 || claude < 20;
         }).length;
 
@@ -50,6 +54,9 @@ function Dashboard() {
             total: accounts.length,
             avgGemini: geminiQuotas.length > 0
                 ? Math.round(geminiQuotas.reduce((a, b) => a + b, 0) / geminiQuotas.length)
+                : 0,
+            avgGeminiImage: geminiImageQuotas.length > 0
+                ? Math.round(geminiImageQuotas.reduce((a, b) => a + b, 0) / geminiImageQuotas.length)
                 : 0,
             avgClaude: claudeQuotas.length > 0
                 ? Math.round(claudeQuotas.reduce((a, b) => a + b, 0) / claudeQuotas.length)
@@ -171,8 +178,8 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* 统计卡片 - 4 columns on medium screens and up */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {/* 统计卡片 - 5 columns on medium screens and up */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                     <div className="bg-white dark:bg-base-100 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-base-200">
                         <div className="flex items-center justify-between mb-2">
                             <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-md">
@@ -194,6 +201,21 @@ function Dashboard() {
                         {stats.avgGemini > 0 && (
                             <div className={`text-[10px] mt-1 ${stats.avgGemini >= 50 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
                                 {stats.avgGemini >= 50 ? t('dashboard.quota_sufficient') : t('dashboard.quota_low')}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="bg-white dark:bg-base-100 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-base-200">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-md">
+                                <Sparkles className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                            </div>
+                        </div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-base-content mb-0.5">{stats.avgGeminiImage}%</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.avg_gemini_image')}</div>
+                        {stats.avgGeminiImage > 0 && (
+                            <div className={`text-[10px] mt-1 ${stats.avgGeminiImage >= 50 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                                {stats.avgGeminiImage >= 50 ? t('dashboard.quota_sufficient') : t('dashboard.quota_low')}
                             </div>
                         )}
                     </div>

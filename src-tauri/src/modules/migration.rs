@@ -160,8 +160,10 @@ pub async fn import_from_v1() -> Result<Vec<Account>, String> {
                             access_token, 
                             refresh_token,
                             expires_in,
-                            Some(email.clone())
-                        );
+                            Some(email.clone()),
+                            None, // project_id 将在需要时获取
+                            None, // session_id
+                    );
                         
                         // 在第153行的get_user_info中已经获取name，但这里是在match语句外，我们巴安全起见使用None
                         match account::upsert_account(email.clone(), None, token_data) {
@@ -242,7 +244,9 @@ pub async fn import_from_db() -> Result<Account, String> {
         token_resp.access_token,
         refresh_token,
         token_resp.expires_in,
-        Some(email.clone())
+        Some(email.clone()),
+        None, // project_id 将在需要时获取
+        None, // session_id 将在 token_manager 中生成
     );
     
     // 4. 添加或更新账号

@@ -25,6 +25,7 @@
     "nav": {
         "dashboard": "Dashboard",
         "accounts": "Accounts",
+        "proxy": "API Proxy",
         "settings": "Settings"
     },
     "dashboard": {
@@ -33,6 +34,7 @@
         "refreshing": "Refreshing...",
         "total_accounts": "Total Accounts",
         "avg_gemini": "Avg. Gemini Quota",
+        "avg_gemini_image": "Avg. Gemini Image Quota",
         "avg_claude": "Avg. Claude Quota",
         "low_quota_accounts": "Low Quota Accounts",
         "quota_sufficient": "Quota Sufficient",
@@ -204,5 +206,48 @@
         "no_account": "No Account",
         "unknown_quota": "Unknown (Click to Refresh)",
         "forbidden": "Account Forbidden"
+    },
+    "proxy": {
+        "title": "API Proxy Service",
+        "status": {
+            "running": "Service Running",
+            "stopped": "Service Stopped",
+            "accounts_available": "{{count}} Accounts Available",
+            "processing": "Processing..."
+        },
+        "action": {
+            "start": "Start Service",
+            "stop": "Stop Service"
+        },
+        "config": {
+            "title": "Service Configuration",
+            "port": "Listen Port",
+            "port_hint": "Default 8045, restart required to apply changes",
+            "auto_start": "Auto Start with App",
+            "api_key": "API Key",
+            "btn_regenerate": "Regenerate Key",
+            "btn_copy": "Copy",
+            "btn_copied": "Copied",
+            "warning_key": "Note: Keep your API key secure. Do not share it."
+        },
+        "example": {
+            "title": "Usage Examples",
+            "curl": "cURL",
+            "python": "Python"
+        },
+        "dialog": {
+            "confirm_regenerate": "Are you sure to regenerate API Key? The old key will be invalid immediately.",
+            "operate_failed": "Operation failed: {{error}}"
+        },
+        "model": {
+            "flash": "Fast Response",
+            "flash_thinking": "Light Thinking",
+            "pro_low": "Standard",
+            "pro_high": "High Performance",
+            "pro_image": "Image Generation",
+            "claude_sonnet": "Balanced",
+            "claude_sonnet_thinking": "Deep Thinking",
+            "claude_opus_thinking": "Strongest Reasoning"
+        }
     }
 }

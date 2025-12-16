@@ -1,14 +1,14 @@
-# Antigravity Tools 🚀
+# Antigravity Tools (2API 版本) 🚀
 
 <div align="center">
   <img src="public/icon.png" alt="Antigravity Logo" width="120" height="120" style="border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
 
-  <h3>Professional Account Management for AI Services</h3>
-  <p>Manage your Gemini / Claude accounts with ease. Unlimited Possibilities.</p>
+  <h3>不仅仅是账号管理，更是您的个人 AI 网关</h3>
+  <p>完美代理 Gemini & Claude，兼容 OpenAI 协议，打破调用限制。</p>
   
   <p>
     <a href="https://github.com/lbjlaq/Antigravity-Manager">
-      <img src="https://img.shields.io/badge/Version-2.1.2-blue?style=flat-square" alt="Version">
+      <img src="https://img.shields.io/badge/Version-3.0.0-blue?style=flat-square" alt="Version">
     </a>
     <img src="https://img.shields.io/badge/Tauri-v2-orange?style=flat-square" alt="Tauri">
     <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square" alt="React">
@@ -16,9 +16,9 @@
   </p>
 
   <p>
-    <a href="#-Downloads">📥 下载最新版 (macOS/Windows/Linux)</a> • 
-    <a href="#-Features">✨ 核心特性</a> • 
-    <a href="#-Comparison">🆚 版本对比</a>
+    <a href="#-Downloads">📥 下载最新版</a> • 
+    <a href="#-API-Proxy">🔌 API 反代 (新!)</a> • 
+    <a href="#-Features">✨ 账号管理</a>
   </p>
 
   <p>
@@ -29,173 +29,83 @@
 
 ---
 
----
+**Antigravity Tools 2API** 次世代版本发布！这不仅仅是一个账号管理器，它将您的桌面变成了一个强大的 **本地 AI 网关 (Local AI Gateway)**。
+
+通过内置的高性能 Rust 反代服务，您可以将浏览器中的 Web Session (`sid`, `__Secure-1PSID` 等) 转化为标准的 **OpenAI API** 接口。这意味着您可以在 **Cursor**, **Windsurf**, **LangChain**, **NextChat** 等任何支持 OpenAI 协议的应用中，无缝调用 Gemini 和 Claude 的高级模型能力。
+
+> **寻找旧版文档?**
+> v2.0 纯账号管理版本的文档已移动至 [README_v2.md](./README_v2.md)。
+
+## � 核心亮点：API 反代 (API Proxy)
+
+将 Web 账号战力转化为标准 API 生产力！
+
+- **OpenAI 协议兼容**: 提供标准的 `/v1/chat/completions` 和 `/v1/models` 接口，无缝对接所有生态应用。
+- **多模型支持**:
+    - **Google**: `gemini-2.0-flash-exp`, `gemini-1.5-pro`
+    - **Claude**: `claude-3-5-sonnet-20241022`
+- **智能轮询 (Auto-Rotation)**: 添加多个账号后，系统会自动在配额耗尽或触发风控时切换到下一个可用账号，实现近乎无限的调用体验。
+- **视觉模型**: 完整支持 GPT-4o 格式的图片输入，自动转换为 Gemini 视觉协议。
+
+### 🖼️ 能力展示 (Showcase)
 
 <div align="center">
-  <img src="docs/images/accounts-dark.png" alt="Antigravity Dark Mode" style="border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); width: 100%; max-width: 800px;">
-  <p><i>（Deep Dark: 沉浸式暗色模式，专注开发）</i></p>
-</div>
 
-## 🎨 界面预览 (Gallery)
-
-<div align="center">
-
-| **Light Mode (清爽明亮)** | **Dark Mode (深邃护眼)** |
+| **Gemini 3 Pro Image (Imagen 3)** | **Claude 3.5 Sonnet (Thinking)** |
 | :---: | :---: |
-| <img src="docs/images/dashboard-light.png" width="100%" style="border-radius: 8px;"> | <img src="docs/images/accounts-dark.png" width="100%" style="border-radius: 8px;"> |
-| **仪表盘 Dashboard** | **账号管理 Accounts** |
-
-| <img src="docs/images/accounts-light.png" width="100%" style="border-radius: 8px;"> | <img src="docs/images/settings-dark.png" width="100%" style="border-radius: 8px;"> |
-| **列表视图 List View** | **全局设置 Settings** |
+| <img src="docs/images/v3/gemini-image-edit.jpg" width="100%" style="border-radius: 8px;"> | <img src="docs/images/v3/claude-code-gen.png" width="100%" style="border-radius: 8px;"> |
+| **NextChat - 图像编辑/生成** | **Windsurf/Cursor - 复杂代码生成** |
 
 </div>
 
----
+## ✨ 经典功能：账号管理
 
-**Antigravity Tools** 是一款专为 AI 开发者和重度用户打造的 **现代化账号管理工具**。
+- **Token 自动保活**: 自动刷新过期 Token，确保随时可用。
+- **可视化配额**:
+    - **文本额度**: 精确显示 Gemini Pro / Claude 3.5 Sonnet 剩余百分比。
+    - **图片额度 (新)**: 新增 Gemini Image (Vision) 额度监控，绘图/识图不再盲目。
+- **IDE 注入**: 一键将 Token 注入到本地 VSCode / Cursor 数据库，无需手动填写 Header。
+- **托盘常驻**: 极简托盘菜单，随时查看核心指标。
 
-作为 [Antigravity Manager](https://github.com/lbjlaq/Antigravity-Manager) 的 2.0 重构版本，它采用了高性能的 **[Tauri v2](https://v2.tauri.app/)** + **[React](https://react.dev/)** 技术栈，将原本笨重的 Python GUI 进化为轻量、极速的原生应用。
+## � 快速开始
 
-它可以帮助你轻松管理数十个 **Google Gemini**、**Claude 3.5** 等 AI 服务账号，实时监控配额（Quota），并在配额耗尽时智能切换，助你实现 "无限" 的 AI 调用体验。
+### 1. 添加账号
+在 **"账号列表"** 页面，通过 OAuth 登录或手动粘贴 Token 添加您的 Google/Anthropic 账号。
 
-> ⚠️ **注意**: 本项目仓库地址保持不变，继续沿用 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)。
->
-> **寻找 1.0 版本?**
-> v1.0 (Python/Flet) 版本的完整源码已归档至 [v1 分支](https://github.com/lbjlaq/Antigravity-Manager/tree/v1)。如需查看或维护旧版，请切换分支查看。
+### 2. 启动服务
+进入 **"API 反代"** 页面：
+1. 配置端口 (默认 8045)。
+2. 点击 **"启动服务"**。
+3. 复制生成的 **API Key** (默认为 `sk-antigravity`)。
 
-## 🆚 为什么选择 2.0 ? (Comparison)
+### 3. 连接使用
+在任何 AI 应用中配置：
+- **Base URL**: `http://localhost:8045/` (部分应用可能需要填写 `http://localhost:8045/v1`)
+- **Key**: `sk-antigravity` (任意不为空的字符串)
+- **Model**: 请使用以下支持的模型 ID
 
-| 特性 Comparison | 🐢 v1.0 (Legacy) | 🚀 v2.0 (New) | 提升 |
-| :--- | :--- | :--- | :--- |
-| **技术核心** | Python + Flet | **Rust (Tauri)** + **React** | **性能质变** |
-| **安装包大小** | ~80 MB | **~10 MB** | **体积减少 87%** |
-| **启动速度** | 慢 (需加载 Python 解释器) | **秒开** (原生二进制) | **极速响应** |
-| **内存占用** | 高 (>200MB) | **极低** (<50MB) | **更省资源** |
-| **界面交互** | 基础 Material 风格 | **现代化 Glassmorphism** | **颜值正义** |
-| **安全性** | 明文/简单混淆 | **本地 JSON 存储** | **透明可控** |
-| **扩展性** | 难 (Python 依赖地狱) | **易** (标准 Web 技术栈) | **生态丰富** |
+#### 📚 支持的模型列表 (Supported Models)
 
-## ✨ 核心特性 (Features)
+| 模型 ID | 说明 |
+| :--- | :--- |
+| **gemini-2.0-flash-exp** | **推荐**。Google 最新一代极速模型，性能最强。 |
+| **gemini-1.5-pro** | 经典的 1.5 Pro 模型，稳定可靠。 |
+| **gemini-1.5-flash** | 1.5 代轻量级模型，速度极快。 |
+| **gemini-3-pro-image** | **绘图专用**。调用 Google Imagen 3 模型生成图片。 |
+| **claude-3-5-sonnet-20241022** | Anthropic 目前最强的代码/推理模型。 |
 
-### 📊 仪表盘 (Dashboard)
-- **全局概览**: 实时展示账号总数、各模型平均配额，健康度一目了然。
-- **智能推荐**: 自动筛选当前配额最充足的 "最佳账号"，支持一键快速切换，始终使用最优资源。
-- **状态监控**: 实时高亮显示低配额告警账号，避免开发中断。
+> 💡 **提示**: 反代服务支持透传所有 Google/Anthropic 官方模型 ID，您可以直接使用官方文档中的任何模型名称。
 
-### 👥 账号管理 (Account Management)
-- **多渠道导入**:
-    - 🔥 **OAuth 授权**: 支持拉起浏览器进行 Google 登录授权，自动获取 Token (推荐)。
-    - 📋 **手动添加**: 支持直接粘贴 Refresh Token 进行添加。
-    - 📂 **V1 迁移**: 支持从 v1 版本 (`~/.antigravity-agent`) 自动扫描并批量导入旧数据。
-    - 🔄 **本地同步**: 支持从 IDE (Cursor/Windsurf) 本地数据库自动读取并导入当前登录账号。
-- **批量操作**: 提供批量刷新配额、批量导出备份 (JSON)、批量删除功能。
-- **搜索过滤**: 支持按邮箱关键字快速检索，管理数十个账号依然轻松。
+## �️ 技术栈升级
 
-### 🔄 配额同步 (Quota Sync)
-- **自动刷新**: 可配置后台自动定时轮询所有账号的最新配额信息。
-- **Token 保活**: 内置 Token 自动刷新机制，过期自动续期，确保连接时刻有效。
-- **精准展示**: 清晰展示 Gemini / Claude 等不同模型的具体剩余百分比和重置时间。
-
-### 🛠️ 系统集成 (System Integration)
-- **托盘常驻**: 程序可最小化至系统托盘，不占用任务栏空间，后台静默运行。
-- **快捷操作**: 托盘菜单支持一键查看当前账号配额、快速切换下一个可用账号。
-- **安全存储**: 采用本地 JSON 格式存储，所有 Token 数据仅保存在用户设备，绝不上传云端。
-
-### ⚙️ 个性化设置 (Settings)
-- **国际化**: 原生支持 **简体中文** / **English** 实时切换。
-- **主题适配**: 完美适配系统的深色 (Dark Mode) / 浅色模式，夜间使用更护眼。
-- **数据管理**: 支持自定义数据导出路径，并提供日志缓存一键清理功能。
-
-## 🛠️ 技术栈
-
-本项目采用前沿的现代技术栈构建，确保了应用的高性能与可维护性：
-
-| 模块 | 技术选型 | 说明 |
+| 模块 | 旧版 v2.0 | 新版 v2.2 (2API) |
 | :--- | :--- | :--- |
-| **Frontend** | React 18 + TypeScript | UI 构建与逻辑处理 |
-| **UI Framework** | TailwindCSS + DaisyUI | 现代化原子类样式库 |
-| **Backend** | Tauri v2 (Rust) | 高性能、安全的系统底层交互 |
-| **Storage** | Local JSON | 本地配置与数据存储 |
-| **State** | Zustand | 轻量级全局状态管理 |
-| **Network** | Reqwest (Async) | 异步网络请求处理 |
-
-## 📦 安装与运行
-
-### 📥 下载安装
-
-前往 [Releases 页面](https://github.com/lbjlaq/Antigravity-Manager/releases) 下载对应系统的安装包：
-
-- **macOS**: 支持 Intel (`.dmg`) 和 Apple Silicon (`.dmg`)
-- **Windows**: `.exe` 安装包
-- **Linux**: `.deb` 或 `.AppImage` *(理论支持，尚未经完整测试，欢迎反馈)*
-
-### 💻 开发环境启动
-
-如果您是开发者，想要贡献代码：
-
-```bash
-# 1. 克隆项目
-git clone https://github.com/lbjlaq/antigravity-tools.git
-
-# 2. 安装前端依赖
-npm install
-
-# 3. 启动开发模式 (Frontend + Backend)
-npm run tauri dev
-```
-
-### 🏗️ 构建发布
-
-```bash
-# 构建通用 macOS 应用 (同时支持 Intel & Apple Silicon)
-npm run build:universal
-```
-
-## ❓ 常见问题 (FAQ)
-
-### ⚠️ 打开应用提示 "已损坏" 或 "无法打开"？
-
-如果在 macOS 上打开应用时提示 **“Antigravity Tools 已损坏，无法打开”**，这是 macOS Gatekeeper 对未签名应用的默认拦截机制。
-
-**解决方法：**
-
-1. 打开终端 (Terminal)。
-2. 复制并执行以下命令 (可能需要输入密码)：
-
-```bash
-sudo xattr -rd com.apple.quarantine "/Applications/Antigravity Tools.app"
-```
-
-> 注意：请根据实际安装位置调整路径，如果安装在“应用程序”目录，通常就是上面的路径。
-
-## 📅 更新日志 (Changelog)
-
-### v2.1.2 (2025-12-16)
-- **🪟 Windows 兼容性**: 修复了在 Windows 下无法打开数据目录的问题。
-- **📁 路径显示**: 设置页面现在显示数据目录的完整绝对路径，方便查找。
-
-### v2.1.0 (2025-12-15)
-- **🔥 OAuth 重构**:
-  - 修复端口冲突问题 (改为随机端口)。
-  - 新增 **"复制链接"** 功能，支持手动在浏览器完成验证。
-  - 新增 **"取消授权"** 按钮，支持主动释放资源。
-- **🎨 图标升级**:
-  - 全新设计的 macOS 风格圆角图标 (Squircle)。
-  - 优化托盘图标显示效果。
-  - 修复旧版 macOS 下图标显示过大的问题。
-- **📖 文档**: 新增常见问题 (FAQ) 指引。
-
-## 👤 作者
-
-**Ctrler**
-
-- 💬 微信公众号: `Ctrler`
-- 🐙 GitHub: [@lbjlaq](https://github.com/lbjlaq)
+| **API Server** | N/A | **Rust (Axum)** 高并发异步服务 |
+| **HTTP Client** | Reqwest | **Reqwest + EventSource** 流式响应 |
+| **Format** | N/A | **OpenAI <-> Gemini** 实时协议转换 |
 
 ## 📄 版权说明
 
-Copyright © 2025 Antigravity. All rights reserved.
-
+Copyright © 2025 Antigravity. 
 本项目采用 **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)** 协议许可。
-禁止将本项目或其衍生作品用于任何商业用途。
-
+仅供个人学习研究使用，禁止用于商业用途。

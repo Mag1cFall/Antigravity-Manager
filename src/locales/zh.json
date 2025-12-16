@@ -25,6 +25,7 @@
     "nav": {
         "dashboard": "仪表盘",
         "accounts": "账号管理",
+        "proxy": "API 反代",
         "settings": "设置"
     },
     "dashboard": {
@@ -33,6 +34,7 @@
         "refreshing": "刷新中...",
         "total_accounts": "总账号数",
         "avg_gemini": "Gemini 平均配额",
+        "avg_gemini_image": "Gemini 绘图平均配额",
         "avg_claude": "Claude 平均配额",
         "low_quota_accounts": "低配额账号",
         "quota_sufficient": "✓ 配额充足",
@@ -204,5 +206,48 @@
         "no_account": "无账号",
         "unknown_quota": "未知 (点击刷新)",
         "forbidden": "账号被封禁"
+    },
+    "proxy": {
+        "title": "API 反代服务",
+        "status": {
+            "running": "服务运行中",
+            "stopped": "服务已停止",
+            "accounts_available": "{{count}} 个账号可用",
+            "processing": "处理中..."
+        },
+        "action": {
+            "start": "启动服务",
+            "stop": "停止服务"
+        },
+        "config": {
+            "title": "服务配置",
+            "port": "监听端口",
+            "port_hint": "默认 8045，修改端口需重启服务",
+            "auto_start": "跟随应用自动启动",
+            "api_key": "API 密钥",
+            "btn_regenerate": "重新生成密钥",
+            "btn_copy": "复制",
+            "btn_copied": "已复制",
+            "warning_key": "注意：请妥善保管您的 API 密钥，不要泄露给他人。"
+        },
+        "example": {
+            "title": "使用示例",
+            "curl": "cURL",
+            "python": "Python"
+        },
+        "dialog": {
+            "confirm_regenerate": "确定要生成新的 API Key 吗？旧的 Key 将立即失效。",
+            "operate_failed": "操作失败: {{error}}"
+        },
+        "model": {
+            "flash": "极速响应",
+            "flash_thinking": "轻量思考",
+            "pro_low": "标准版",
+            "pro_high": "高配版",
+            "pro_image": "图像生成",
+            "claude_sonnet": "均衡模型",
+            "claude_sonnet_thinking": "深度思考",
+            "claude_opus_thinking": "最强推理"
+        }
     }
 }

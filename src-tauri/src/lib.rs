@@ -2,8 +2,10 @@ mod models;
 mod modules;
 mod commands;
 mod utils;
+mod proxy;  // 反代服务模块
 pub mod error;
 
+use tauri::Manager;
 use modules::logger;
 
 // 测试命令
@@ -21,8 +23,42 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let _ = app.get_webview_window("main")
+                .map(|window| {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                    #[cfg(target_os = "macos")]
+                    app.set_activation_policy(tauri::ActivationPolicy::Regular).unwrap_or(());
+                });
+        }))
+        .manage(commands::proxy::ProxyServiceState::new())
         .setup(|app| {
+            println!("Setup starting...");
             modules::tray::create_tray(app.handle())?;
+            println!("Tray created");
+            
+            // 自动启动反代服务
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                // 加载配置
+                if let Ok(config) = modules::config::load_app_config() {
+                    if config.proxy.auto_start {
+                        let state = handle.state::<commands::proxy::ProxyServiceState>();
+                        // 尝试启动服务
+                        if let Err(e) = commands::proxy::start_proxy_service(
+                            config.proxy,
+                            state,
+                            handle.clone(),
+                        ).await {
+                            eprintln!("自动启动反代服务失败: {}", e);
+                        } else {
+                            println!("反代服务自动启动成功");
+                        }
+                    }
+                }
+            });
+            
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -61,6 +97,13 @@ pub fn run() {
             commands::get_data_dir_path,
             commands::show_main_window,
             commands::get_antigravity_path,
+            // 反代服务命令
+            commands::proxy::start_proxy_service,
+            commands::proxy::stop_proxy_service,
+            commands::proxy::get_proxy_status,
+            commands::proxy::get_proxy_stats,
+            commands::proxy::generate_api_key,
+            commands::proxy::reload_proxy_accounts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

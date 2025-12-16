@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
 import Settings from './pages/Settings';
+import ApiProxy from './pages/ApiProxy';
 import ThemeManager from './components/common/ThemeManager';
 import { useEffect } from 'react';
 import { useConfigStore } from './stores/useConfigStore';
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: 'accounts',
         element: <Accounts />,
+      },
+      {
+        path: 'api-proxy',
+        element: <ApiProxy />,
       },
       {
         path: 'settings',

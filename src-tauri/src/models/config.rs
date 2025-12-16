@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::proxy::ProxyConfig;
 
 /// 应用配置
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -10,6 +11,8 @@ pub struct AppConfig {
     pub auto_sync: bool,
     pub sync_interval: i32,  // 分钟
     pub default_export_path: Option<String>,
+    #[serde(default)]
+    pub proxy: ProxyConfig,
 }
 
 impl AppConfig {
@@ -22,6 +25,7 @@ impl AppConfig {
             auto_sync: false,
             sync_interval: 5,
             default_export_path: None,
+            proxy: ProxyConfig::default(),
         }
     }
 }
