@@ -82,6 +82,16 @@ cd /opt/antigravity && sudo ./install.sh
 - **Xvfb**: 虚拟显示器，让 GUI 程序在无显示器环境运行
 - **HOME 重定向**: `HOME=$PWD` 使程序在当前目录创建 `.antigravity_tools/`，实现便携部署
 
+## ⚠️ 方案局限性 (Limitations)
+
+这种通过 Xvfb 运行 GUI 应用的“伪无头”方案存在以下缺点：
+- **资源占用高**: 即使没有显示器，后台依然运行着完整的 WebView 渲染引擎，内存和 CPU 开销显著高于纯后端服务。
+- **依赖较多**: 需要安装 Xvfb 及 GTK/WebKit 等图形库依赖。
+- **启动速度**: 相比原生 Web 服务，GUI 应用的启动和初始化稍慢。
+
+> [!TIP]
+> 我们正在开发 **Web 原生模式 (PR #398)**，未来将支持真正的轻量化服务器部署，敬请期待。
+
 ## 系统要求
 
 - Ubuntu 20.04+ / Debian 11+ / RHEL 8+ / CentOS Stream 8+

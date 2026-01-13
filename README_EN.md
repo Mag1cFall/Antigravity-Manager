@@ -138,6 +138,7 @@ If you need to run on a headless remote Linux server (Ubuntu/Debian/CentOS), use
 ```bash
 curl -fsSL https://raw.githubusercontent.com/lbjlaq/Antigravity-Manager/main/deploy/headless-xvfb/install.sh | sudo bash
 ```
+> **Note**: This solution uses Xvfb to simulate a GUI environment. Resource consumption (RAM/CPU) will be higher than a native backend service.
 > **See**: [Server Deployment Guide (deploy/headless-xvfb)](./deploy/headless-xvfb/README.md)
 
 ### 🛠️ Troubleshooting
