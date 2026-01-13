@@ -41,8 +41,10 @@
         "theme_to_light": "Switch to Light Mode",
         "switch_to_english": "Switch to English",
         "switch_to_chinese": "Switch to Chinese",
+        "switch_to_traditional_chinese": "Switch to Traditional Chinese",
         "switch_to_english_short": "EN",
         "switch_to_chinese_short": "ZH",
+        "switch_to_traditional_chinese_short": "TW",
         "switch_to_japanese": "Switch to Japanese",
         "switch_to_japanese_short": "JA",
         "switch_to_turkish": "Switch to Turkish",
@@ -654,5 +656,14 @@
         "title": "New Version Available",
         "message": "A new version is ready with optimizations and improvements. Current: v{{current}}",
         "action": "Update Now"
+    },
+    "errors": {
+        "stream": {
+            "timeout_error": "Request timeout, please check your network connection",
+            "connection_error": "Connection failed, please check your network or proxy settings",
+            "decode_error": "Network unstable, data transmission interrupted. Try: 1) Check network 2) Switch proxy 3) Retry",
+            "stream_error": "Stream transmission error, please retry later",
+            "unknown_error": "Unknown error occurred, please retry later"
+        }
     }
 }

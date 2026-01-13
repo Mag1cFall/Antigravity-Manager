@@ -200,10 +200,10 @@ impl TokenManager {
             .and_then(|v| v.as_str())
             .map(|s| s.to_string());
         
-        // [FIX #563] 提取剩余配额用于优先级排序
+        // [FIX #563] 提取最大剩余配额百分比用于优先级排序 (Option<i32> now)
         let remaining_quota = account.get("quota")
-            .map(|q| self.calculate_quota_stats(q).1) // (total, remaining) -> remaining
-            .filter(|&r| r > 0);
+            .and_then(|q| self.calculate_quota_stats(q));
+            // .filter(|&r| r > 0); // 移除 >0 过滤，因为 0% 也是有效数据，只是优先级低
         
         Ok(Some(ProxyToken {
             account_id,
@@ -238,7 +238,7 @@ impl TokenManager {
             Some(q) => q,
             None => return false, // 无配额信息，跳过
         };
-        
+
         // 3. 检查是否已经被配额保护禁用
         if account_json.get("proxy_disabled")
             .and_then(|v| v.as_bool())
@@ -253,55 +253,69 @@ impl TokenManager {
             return true; // 被其他原因禁用，跳过
         }
         
-        // 4. 计算总配额和剩余配额
-        let (total_quota, remaining_quota) = self.calculate_quota_stats(quota);
+        // 4. 获取模型列表
+        let models = match quota.get("models").and_then(|m| m.as_array()) {
+            Some(m) => m,
+            None => return false,
+        };
+
+        // 5. 遍历受监控的模型，检查是否有任何一个低于阈值
+        let threshold = config.threshold_percentage as i32;
         
-        if total_quota == 0 {
-            return false; // 无有效配额数据
-        }
-        
-        // 5. 计算阈值
-        let threshold = (total_quota as f64 * config.threshold_percentage as f64 / 100.0) as i32;
-        
-        // 6. 检查是否需要保护
-        if remaining_quota <= threshold {
-            tracing::warn!(
-                "配额保护触发: {} 剩余配额 {}/{} (阈值: {})",
-                account_json.get("email").and_then(|v| v.as_str()).unwrap_or("unknown"),
-                remaining_quota,
-                total_quota,
-                threshold
-            );
-            
-            // 触发配额保护
-            let account_id = account_json.get("id").and_then(|v| v.as_str()).unwrap_or("unknown");
-            let _ = self.trigger_quota_protection(account_id, account_path, remaining_quota, total_quota, threshold).await;
-            return true;
+        for model in models {
+            let name = model.get("name").and_then(|v| v.as_str()).unwrap_or("");
+            if !config.monitored_models.iter().any(|m| m == name) {
+                continue; // 不在监控列表，跳过
+            }
+
+            // 获取该模型的百分比 (percentage)
+            let percentage = model.get("percentage").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+
+            if percentage <= threshold {
+                tracing::warn!(
+                    "配额保护触发: {} 模型 {} 剩余 {}% (阈值: {}%)",
+                    account_json.get("email").and_then(|v| v.as_str()).unwrap_or("unknown"),
+                    name,
+                    percentage,
+                    threshold
+                );
+                
+                // 触发配额保护
+                let account_id = account_json.get("id").and_then(|v| v.as_str()).unwrap_or("unknown");
+                let _ = self.trigger_quota_protection(account_id, account_path, percentage, threshold, name).await;
+                return true;
+            }
         }
         
         false
     }
     
-    /// 计算账号的总配额和剩余配额
-    fn calculate_quota_stats(&self, quota: &serde_json::Value) -> (i32, i32) {
+    /// 计算账号的最大剩余配额百分比（用于排序）
+    /// 返回值: Option<i32> (max_percentage)
+    fn calculate_quota_stats(&self, quota: &serde_json::Value) -> Option<i32> {
         let models = match quota.get("models").and_then(|m| m.as_array()) {
             Some(m) => m,
-            None => return (0, 0),
+            None => return None,
         };
         
-        let mut total = 0;
-        let mut remaining = 0;
+        let mut max_percentage = 0;
+        let mut has_data = false;
         
         for model in models {
-            if let Some(limit) = model.get("limit").and_then(|v| v.as_i64()) {
-                total += limit as i32;
-            }
-            if let Some(rem) = model.get("remaining").and_then(|v| v.as_i64()) {
-                remaining += rem as i32;
+            if let Some(pct) = model.get("percentage").and_then(|v| v.as_i64()) {
+                let pct_i32 = pct as i32;
+                if pct_i32 > max_percentage {
+                    max_percentage = pct_i32;
+                }
+                has_data = true;
             }
         }
         
-        (total, remaining)
+        if has_data {
+            Some(max_percentage)
+        } else {
+            None
+        }
     }
     
     /// 触发配额保护，禁用账号
@@ -309,9 +323,9 @@ impl TokenManager {
         &self,
         account_id: &str,
         account_path: &PathBuf,
-        remaining: i32,
-        total: i32,
+        current_val: i32,
         threshold: i32,
+        model_name: &str,
     ) -> Result<(), String> {
         let mut content: serde_json::Value = serde_json::from_str(
             &std::fs::read_to_string(account_path).map_err(|e| format!("读取文件失败: {}", e))?,
@@ -322,7 +336,7 @@ impl TokenManager {
         content["proxy_disabled"] = serde_json::Value::Bool(true);
         content["proxy_disabled_at"] = serde_json::Value::Number(now.into());
         content["proxy_disabled_reason"] = serde_json::Value::String(
-            format!("quota_protection: {}/{} (阈值: {})", remaining, total, threshold)
+            format!("quota_protection: {} ({}% <= {}%)", model_name, current_val, threshold)
         );
         
         std::fs::write(account_path, serde_json::to_string_pretty(&content).unwrap())
@@ -340,23 +354,36 @@ impl TokenManager {
         quota: &serde_json::Value,
         config: &crate::models::QuotaProtectionConfig,
     ) -> bool {
-        // 计算当前配额
-        let (total_quota, remaining_quota) = self.calculate_quota_stats(quota);
+        let models = match quota.get("models").and_then(|m| m.as_array()) {
+            Some(m) => m,
+            None => return true, // 无模型数据，保持禁用
+        };
         
-        if total_quota == 0 {
-            return true; // 无法判断，保持禁用状态
+        let threshold = config.threshold_percentage as i32;
+        let mut all_above_threshold = true;
+        let mut has_monitored = false;
+
+        for model in models {
+            let name = model.get("name").and_then(|v| v.as_str()).unwrap_or("");
+            if !config.monitored_models.iter().any(|m| m == name) {
+                continue;
+            }
+            
+            has_monitored = true;
+            let percentage = model.get("percentage").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+            
+            if percentage <= threshold {
+                all_above_threshold = false;
+                break;
+            }
         }
         
-        let threshold = (total_quota as f64 * config.threshold_percentage as f64 / 100.0) as i32;
-        
-        // 如果配额已恢复到阈值以上，自动启用账号
-        if remaining_quota > threshold {
+        // 只有当存在受监控模型，且所有受监控模型的配额都高于阈值时，才恢复
+        if has_monitored && all_above_threshold {
             let account_id = account_json.get("id").and_then(|v| v.as_str()).unwrap_or("unknown");
             tracing::info!(
-                "配额已恢复: {} 剩余配额 {}/{} (阈值: {}), 自动启用账号",
+                "配额已恢复: {} 所有监控模型配额均 > {}%, 自动启用账号",
                 account_json.get("email").and_then(|v| v.as_str()).unwrap_or("unknown"),
-                remaining_quota,
-                total_quota,
                 threshold
             );
             
@@ -364,7 +391,7 @@ impl TokenManager {
             return false; // 已恢复，可以使用
         }
         
-        true // 仍然低于阈值，保持禁用
+        true // 仍然低于阈值或无监控模型，保持禁用
     }
     
     /// 恢复被配额保护禁用的账号
@@ -431,11 +458,11 @@ impl TokenManager {
                 return tier_cmp;
             }
             
-            // [FIX #563] Second: compare by remaining quota (higher is better)
-            // Accounts with unknown/zero quota go last within their tier
+            // [FIX #563] Second: compare by remaining quota percentage (higher is better)
+            // Accounts with unknown/zero percentage go last within their tier
             let quota_a = a.remaining_quota.unwrap_or(0);
             let quota_b = b.remaining_quota.unwrap_or(0);
-            quota_b.cmp(&quota_a)  // Descending: higher quota first
+            quota_b.cmp(&quota_a)  // Descending: higher percentage first
         });
 
 

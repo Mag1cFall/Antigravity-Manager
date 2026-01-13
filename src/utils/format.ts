@@ -1,9 +1,10 @@
 import { formatDistanceToNow } from 'date-fns';
-import { zhCN, enUS, ja, tr, vi } from 'date-fns/locale';
+import { zhCN, zhTW, enUS, ja, tr, vi } from 'date-fns/locale';
 
 export function formatRelativeTime(timestamp: number, language: string = 'zh-CN'): string {
     let locale = enUS;
-    if (language === 'zh-CN') locale = zhCN;
+    if (language === 'zh-CN' || language === 'zh') locale = zhCN;
+    else if (language === 'zh-TW') locale = zhTW;
     else if (language === 'ja') locale = ja;
     else if (language === 'tr') locale = tr;
     else if (language === 'vi') locale = vi;

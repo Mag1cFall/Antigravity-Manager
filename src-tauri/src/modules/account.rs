@@ -627,6 +627,7 @@ pub fn update_account_quota(account_id: &str, quota: QuotaData) -> Result<(), St
     if let Ok(config) = crate::modules::config::load_app_config() {
         if config.quota_protection.enabled {
             let mut min_percentage = 101; 
+            let mut min_model_name = String::new();
             let mut has_models = false;
             
             if let Some(ref q) = account.quota {
@@ -639,6 +640,7 @@ pub fn update_account_quota(account_id: &str, quota: QuotaData) -> Result<(), St
                     has_models = true;
                     if model.percentage < min_percentage {
                         min_percentage = model.percentage;
+                        min_model_name = model.name.clone();
                     }
                 }
             }
@@ -654,15 +656,15 @@ pub fn update_account_quota(account_id: &str, quota: QuotaData) -> Result<(), St
                     if !account.proxy_disabled || is_already_protected {
                         if !account.proxy_disabled {
                             crate::modules::logger::log_info(&format!(
-                                "[Quota] 触发保护: {} (监控模型最低额度 {}% <= 阈值 {}%)",
-                                account.email, min_percentage, threshold
+                                "[Quota] 触发保护: {} ({} 剩余 {}% <= 阈值 {}%)",
+                                account.email, min_model_name, min_percentage, threshold
                             ));
                         }
                         account.proxy_disabled = true;
                         account.proxy_disabled_at = Some(chrono::Utc::now().timestamp());
                         account.proxy_disabled_reason = Some(format!(
-                            "quota_protection: {}% (阈值: {}%)",
-                            min_percentage, threshold
+                            "quota_protection: {} ({}% <= {}%)",
+                            min_model_name, min_percentage, threshold
                         ));
                     }
                 } else {

@@ -4,6 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import en from "./locales/en.json";
 import zh from "./locales/zh.json";
+import zhTW from "./locales/zh-TW.json";
 import ja from "./locales/ja.json";
 import tr from "./locales/tr.json";
 import vi from "./locales/vi.json";
@@ -23,6 +24,9 @@ i18n
             },
             zh: {
                 translation: zh,
+            },
+            "zh-TW": {
+                translation: zhTW,
             },
             ja: {
                 translation: ja,

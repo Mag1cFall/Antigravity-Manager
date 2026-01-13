@@ -101,7 +101,7 @@ pub async fn check_for_updates() -> Result<UpdateInfo, String> {
     })
 }
 
-/// Compare two semantic versions (e.g., "3.3.24" vs "3.3.23")
+/// Compare two semantic versions (e.g., "3.3.26" vs "3.3.25")
 fn compare_versions(latest: &str, current: &str) -> bool {
     let parse_version = |v: &str| -> Vec<u32> {
         v.split('.')
