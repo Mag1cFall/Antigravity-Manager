@@ -656,5 +656,14 @@
         "title": "New Version Available",
         "message": "A new version is ready with optimizations and improvements. Current: v{{current}}",
         "action": "Update Now"
+    },
+    "errors": {
+        "stream": {
+            "timeout_error": "Request timeout, please check your network connection",
+            "connection_error": "Connection failed, please check your network or proxy settings",
+            "decode_error": "Network unstable, data transmission interrupted. Try: 1) Check network 2) Switch proxy 3) Retry",
+            "stream_error": "Stream transmission error, please retry later",
+            "unknown_error": "Unknown error occurred, please retry later"
+        }
     }
 }

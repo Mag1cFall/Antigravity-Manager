@@ -236,16 +236,17 @@ pub fn create_openai_sse_stream(
                 }
                 Err(e) => {
                     use crate::proxy::mappers::error_classifier::classify_stream_error;
-                    let (error_type, user_message) = classify_stream_error(&e);
+                    let (error_type, user_message, i18n_key) = classify_stream_error(&e);
                     
                     tracing::error!(
                         error_type = %error_type,
                         user_message = %user_message,
+                        i18n_key = %i18n_key,
                         raw_error = %e,
                         "OpenAI stream error occurred"
                     );
                     
-                    // 发送友好的 SSE 错误事件
+                    // 发送友好的 SSE 错误事件(包含 i18n_key 供前端翻译)
                     let error_chunk = json!({
                         "id": &stream_id,
                         "object": "chat.completion.chunk",
@@ -255,7 +256,8 @@ pub fn create_openai_sse_stream(
                         "error": {
                             "type": error_type,
                             "message": user_message,
-                            "code": "stream_error"
+                            "code": "stream_error",
+                            "i18n_key": i18n_key
                         }
                     });
                     
@@ -369,16 +371,17 @@ pub fn create_legacy_sse_stream(
                 }
                 Err(e) => {
                     use crate::proxy::mappers::error_classifier::classify_stream_error;
-                    let (error_type, user_message) = classify_stream_error(&e);
+                    let (error_type, user_message, i18n_key) = classify_stream_error(&e);
                     
                     tracing::error!(
                         error_type = %error_type,
                         user_message = %user_message,
+                        i18n_key = %i18n_key,
                         raw_error = %e,
                         "Legacy stream error occurred"
                     );
                     
-                    // 发送友好的 SSE 错误事件
+                    // 发送友好的 SSE 错误事件(包含 i18n_key 供前端翻译)
                     let error_chunk = json!({
                         "id": &stream_id,
                         "object": "text_completion",
@@ -388,7 +391,8 @@ pub fn create_legacy_sse_stream(
                         "error": {
                             "type": error_type,
                             "message": user_message,
-                            "code": "stream_error"
+                            "code": "stream_error",
+                            "i18n_key": i18n_key
                         }
                     });
                     
@@ -666,22 +670,24 @@ pub fn create_codex_sse_stream(
                 }
                 Err(e) => {
                     use crate::proxy::mappers::error_classifier::classify_stream_error;
-                    let (error_type, user_message) = classify_stream_error(&e);
+                    let (error_type, user_message, i18n_key) = classify_stream_error(&e);
                     
                     tracing::error!(
                         error_type = %error_type,
                         user_message = %user_message,
+                        i18n_key = %i18n_key,
                         raw_error = %e,
                         "Codex stream error occurred"
                     );
                     
-                    // 发送友好的错误事件
+                    // 发送友好的错误事件(包含 i18n_key 供前端翻译)
                     let error_ev = json!({
                         "type": "error",
                         "error": {
                             "type": error_type,
                             "message": user_message,
-                            "code": "stream_error"
+                            "code": "stream_error",
+                            "i18n_key": i18n_key
                         }
                     });
                     yield Ok(Bytes::from(format!("data: {}\n\n", serde_json::to_string(&error_ev).unwrap())));

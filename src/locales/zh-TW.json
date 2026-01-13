@@ -656,5 +656,14 @@
         "title": "發現新版本",
         "message": "新版本已準備就緒，包含多項最佳化與改進。當前版本: v{{current}}",
         "action": "立即更新"
+    },
+    "errors": {
+        "stream": {
+            "timeout_error": "請求逾時,請檢查網路連線",
+            "connection_error": "無法連線到伺服器,請檢查網路或代理設定",
+            "decode_error": "網路連線不穩定,資料傳輸中斷。建議: 1) 檢查網路連線 2) 更換代理節點 3) 稍後重試",
+            "stream_error": "資料流傳輸錯誤,請稍後重試",
+            "unknown_error": "發生未知錯誤,請稍後重試"
+        }
     }
 }
