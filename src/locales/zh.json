@@ -135,6 +135,7 @@
         "warmup_this": "预热该账号",
         "warmup_now": "立即预热",
         "warmup_batch_triggered": "已成功为 {{count}} 个账号触发预热任务",
+        "quota_protected": "受保护",
         "details": {
             "title": "配额详情"
         },

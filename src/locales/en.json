@@ -135,6 +135,7 @@
         "warmup_this": "Warmup this account",
         "warmup_now": "Warmup Now",
         "warmup_batch_triggered": "Warmup tasks triggered for {{count}} accounts",
+        "quota_protected": "Protected",
         "details": {
             "title": "Quota Details"
         },

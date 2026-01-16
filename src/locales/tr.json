@@ -121,6 +121,7 @@
         "reset_time": "Sıfırlama Zamanı",
         "switch_to": "Bu hesaba geç",
         "actions": "İşlemler",
+        "quota_protected": "Korumalı",
         "details": {
             "title": "Kota Detayları"
         },

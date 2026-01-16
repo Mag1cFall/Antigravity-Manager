@@ -130,6 +130,7 @@
         "warmup_this": "Aquecer esta conta",
         "warmup_now": "Aquecer Agora",
         "warmup_batch_triggered": "Tarefas de aquecimento acionadas para {{count}} contas",
+        "quota_protected": "Protegido",
         "details": {
             "title": "Detalhes da Cota"
         },

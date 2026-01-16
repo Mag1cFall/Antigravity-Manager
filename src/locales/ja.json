@@ -121,6 +121,7 @@
         "reset_time": "リセット時間",
         "switch_to": "このアカウントに切り替え",
         "actions": "操作",
+        "quota_protected": "保護中",
         "details": {
             "title": "クォータ詳細"
         },

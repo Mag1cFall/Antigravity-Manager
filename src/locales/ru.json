@@ -130,6 +130,7 @@
         "warmup_this": "Разогреть этот аккаунт",
         "warmup_now": "Разогреть сейчас",
         "warmup_batch_triggered": "Задачи разогрева запущены для {{count}} аккаунтов",
+        "quota_protected": "Защищено",
         "details": {
             "title": "Детали квоты"
         },

@@ -128,6 +128,7 @@
         "warmup_this": "Làm nóng tài khoản này",
         "warmup_now": "Làm nóng Ngay",
         "warmup_batch_triggered": "Đã kích hoạt làm nóng cho {{count}} tài khoản",
+        "quota_protected": "Được bảo vệ",
         "details": {
             "title": "Chi tiết Hạn mức"
         },
